@@ -13,6 +13,9 @@ echo "================================"
 # Navigate to app directory
 cd /home/Trading/flask-app-test || exit 1
 
+# Save deploy script to temp location to prevent it from being deleted
+cp deploy.sh /tmp/deploy.sh.bak 2>/dev/null || true
+
 # Fetch latest changes
 echo "[1/5] Fetching updates from GitHub..."
 git fetch --all --tags
@@ -22,6 +25,13 @@ echo "[2/5] Switching to $VERSION..."
 git stash 2>/dev/null
 git checkout $VERSION
 git pull origin $VERSION 2>/dev/null || echo "Already on latest"
+
+# Restore deploy script if it was deleted
+if [ ! -f deploy.sh ] && [ -f /tmp/deploy.sh.bak ]; then
+    echo "Restoring deploy.sh (not present in $VERSION)..."
+    cp /tmp/deploy.sh.bak deploy.sh
+    chmod +x deploy.sh
+fi
 
 # Activate virtual environment
 echo "[3/5] Activating virtual environment..."
