@@ -40,8 +40,8 @@ nohup gunicorn --bind 0.0.0.0:$PORT app:app > gunicorn.log 2>&1 &
 # Wait a moment for the app to start
 sleep 2
 
-# Get public IP address
-PUBLIC_IP=$(curl -s ifconfig.me || curl -s icanhazip.com || hostname -I | awk '{print $1}')
+# Get public IP address (prefer IPv4)
+PUBLIC_IP=$(curl -4 -s ifconfig.me || curl -4 -s icanhazip.com || hostname -I | awk '{print $1}')
 
 # Test if app is running
 if curl -s http://localhost:$PORT/ > /dev/null 2>&1; then
